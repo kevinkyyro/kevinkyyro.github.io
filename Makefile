@@ -1,12 +1,27 @@
 head ?= $(shell git rev-parse --short HEAD)
+today ?= $(shell date +%Y-%m-%d)
 
-.PHONY: clean
-clean:
-	stack exec site clean
+.PHONY: build check clean deploy preview rebuild server watch
+build:   ; stack exec site build
+check:   ; stack exec site check
+clean:   ; stack exec site clean
+deploy:  ; stack exec site deploy
+preview: ; stack exec site preview
+rebuild: ; stack exec site rebuild
+server:  ; stack exec site server
+watch:   ; stack exec site watch
 
-.PHONY: build
-build:
-	stack exec site build
+.PHONY: new-post
+new-post: posts
+	@read -p "title: " title; touch posts/$(today)-$$title.md
+
+.PHONY: new-draft
+new-draft: drafts
+	@read -p "title: " title; touch drafts/$(today)-$$title.md
+
+#
+# Publication
+#
 
 .PHONY: pre-publish
 pre-publish: | clean _site
@@ -32,6 +47,12 @@ publish: | pre-publish build commit
 #
 # Files
 #
+
+drafts:
+	mkdir drafts
+
+posts:
+	mkdir posts
 
 _site:
 	git submodule init
